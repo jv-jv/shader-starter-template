@@ -57,65 +57,20 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.set(0, 0, 20)
 scene.add(camera)
 
-const raycaster = new THREE.Raycaster()
-const mouse = new THREE.Vector2()
-const plane = new THREE.Plane()
-const planeNormal = new THREE.Vector3()
-const intersectionPoint = new THREE.Vector3()
-
-window.addEventListener("mousemove", (event) => {
-  mouse.x = (event.clientX / window.innerWidth) * 2 - 1
-  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
-  planeNormal.copy(camera.position).normalize()
-  plane.setFromNormalAndCoplanarPoint(planeNormal, scene.position)
-  raycaster.setFromCamera(mouse, camera)
-  raycaster.ray.intersectPlane(plane, intersectionPoint)
-  console.log("intersectionPoint :", intersectionPoint)
-})
-
 // Sphere
 
 const sphereGeometry = new THREE.SphereBufferGeometry(1, 100, 100)
-
-const count = sphereGeometry.attributes.position.count
-const randomsValues = new Float32Array(count).map((e) => Math.random())
-sphereGeometry.setAttribute(
-  "aRandom",
-  new THREE.BufferAttribute(randomsValues, 1)
-)
 
 const shaderMaterial = new THREE.RawShaderMaterial({
   vertexShader: testVertexShader,
   fragmentShader: testFragmentShader,
   uniforms: {
     uTime: { value: 0 },
-    uMouse: { value: { x: 0, y: 0, z: 0 } },
   },
 })
 const sphere = new THREE.Mesh(sphereGeometry, shaderMaterial)
 sphere.position.set(0, 0, 0)
 scene.add(sphere)
-
-const instanceClock = new THREE.Clock()
-const sphereTick = () => {
-  const elapsedTime = instanceClock.getElapsedTime()
-  const { x, y, z } = intersectionPoint
-  sphere.rotation.y += 0.0025
-  sphere.rotation.z += 0.0025
-
-  // Update material
-  shaderMaterial.uniforms.uTime.value = elapsedTime
-  shaderMaterial.uniforms.uMouse.value = { x, y, z }
-
-  // Call tick again on the next frame
-  window.requestAnimationFrame(sphereTick)
-}
-sphereTick()
-
-// window.addEventListener("click", () => {
-//   const { x, y, z } = intersectionPoint
-//   renderSphere({ x, y, z })
-// })
 
 // Controls
 const controls = new OrbitControls(camera, canvas)
@@ -139,7 +94,7 @@ const tick = () => {
   const elapsedTime = clock.getElapsedTime()
 
   // Update material
-  // shaderMaterial.uniforms.uTime.value = elapsedTime
+  shaderMaterial.uniforms.uTime.value = elapsedTime
   // Update controls
   controls.update()
 

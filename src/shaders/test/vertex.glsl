@@ -4,7 +4,6 @@ uniform mat4 projectionMatrix;
 uniform mat4 viewMatrix;
 uniform mat4 modelMatrix;
 uniform float uTime;
-uniform vec3 uMouse;
 
 attribute vec3 position;
 
